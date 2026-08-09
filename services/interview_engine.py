@@ -1,3 +1,4 @@
+from services.feedback_engine import FeedbackEngine
 import json
 from typing import Any
 
@@ -24,6 +25,10 @@ class InterviewEngine:
 
         self.planner = InterviewPlanner(
             self.curriculum
+        )
+
+        self.feedback_engine = FeedbackEngine(
+            self.gemini
         )
 
     def start_interview(
@@ -352,10 +357,15 @@ The follow-up must:
 
         session.primary_questions_asked += 1
 
+        # Interview is complete.
         if (
             session.primary_questions_asked
             >= len(session.interview_plan.questions)
         ):
+            feedback = self.feedback_engine.generate_feedback(
+                session
+            )
+
             self.sessions.mark_completed(
                 session.session_id
             )
@@ -363,8 +373,10 @@ The follow-up must:
             return {
                 "reply": "Interview completed.",
                 "done": True,
+                "feedback": feedback,
             }
 
+        # Move to the next primary question.
         self.sessions.advance_question(
             session.session_id
         )
