@@ -12,8 +12,10 @@ const interviewScreen = document.getElementById("interview-screen");
 const completeScreen = document.getElementById("complete-screen");
 
 const candidateInput = document.getElementById("candidate-id");
+
 const startButton = document.getElementById("start-btn");
 const submitButton = document.getElementById("submit-btn");
+const restartButton = document.getElementById("restart-btn");
 
 const questionText = document.getElementById("question-text");
 const answerInput = document.getElementById("answer-input");
@@ -41,6 +43,7 @@ function generateSessionId() {
 
 
 function showScreen(screen) {
+
     startScreen.classList.add("hidden");
     interviewScreen.classList.add("hidden");
     completeScreen.classList.add("hidden");
@@ -50,23 +53,31 @@ function showScreen(screen) {
 
 
 function updateProgress() {
+
     questionCounter.textContent =
         `Question ${questionNumber} / ${totalQuestions}`;
 
     const percentage =
         (questionNumber / totalQuestions) * 100;
 
-    progressFill.style.width = `${percentage}%`;
+    progressFill.style.width =
+        `${percentage}%`;
 }
 
 
 function setLoading(button, loading, originalText) {
+
     button.disabled = loading;
 
     if (loading) {
-        button.innerHTML = "Thinking...";
+
+        button.innerHTML =
+            "Thinking...";
+
     } else {
-        button.innerHTML = `${originalText} <span>→</span>`;
+
+        button.innerHTML =
+            `${originalText} <span>→</span>`;
     }
 }
 
@@ -75,23 +86,33 @@ function setLoading(button, loading, originalText) {
 // Start Interview
 // -------------------------
 
-startButton.addEventListener("click", startInterview);
+startButton.addEventListener(
+    "click",
+    startInterview
+);
 
 
 async function startInterview() {
 
-    const candidateId = candidateInput.value.trim();
+    const candidateId =
+        candidateInput.value.trim();
 
     startError.textContent = "";
 
     if (!candidateId) {
+
         startError.textContent =
             "Please enter a candidate ID.";
+
+        candidateInput.focus();
 
         return;
     }
 
-    sessionId = generateSessionId();
+
+    sessionId =
+        generateSessionId();
+
 
     setLoading(
         startButton,
@@ -99,33 +120,46 @@ async function startInterview() {
         "Start Interview"
     );
 
+
     try {
 
-        const response = await fetch("/api/interview", {
-            method: "POST",
+        const response =
+            await fetch(
+                "/api/interview",
+                {
+                    method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            body: JSON.stringify({
-                sessionId: sessionId,
-                candidate: candidateId
-            })
-        });
+                    body: JSON.stringify({
+                        sessionId:
+                            sessionId,
+
+                        candidate:
+                            candidateId
+                    })
+                }
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!response.ok) {
+
             throw new Error(
-                data.error || "Failed to start interview."
+                data.error ||
+                "Failed to start interview."
             );
         }
 
 
         if (!data.reply) {
+
             throw new Error(
                 "Interview API returned no question."
             );
@@ -134,23 +168,38 @@ async function startInterview() {
 
         questionNumber = 1;
 
-        questionText.textContent = data.reply;
+        questionText.textContent =
+            data.reply;
 
         answerInput.value = "";
 
+        answerStatus.textContent =
+            "Be clear and explain your reasoning.";
+
+        interviewError.textContent = "";
+
         updateProgress();
 
-        showScreen(interviewScreen);
+        showScreen(
+            interviewScreen
+        );
 
         answerInput.focus();
 
+
     } catch (error) {
 
-        console.error("Start interview error:", error);
+        console.error(
+            "Start interview error:",
+            error
+        );
 
         startError.textContent =
             error.message ||
             "Unable to start the interview.";
+
+        sessionId = null;
+
 
     } finally {
 
@@ -167,14 +216,19 @@ async function startInterview() {
 // Submit Answer
 // -------------------------
 
-submitButton.addEventListener("click", submitAnswer);
+submitButton.addEventListener(
+    "click",
+    submitAnswer
+);
 
 
 async function submitAnswer() {
 
-    const answer = answerInput.value.trim();
+    const answer =
+        answerInput.value.trim();
 
     interviewError.textContent = "";
+
 
     if (!answer) {
 
@@ -202,46 +256,66 @@ async function submitAnswer() {
         "Submit Answer"
     );
 
+
     answerStatus.textContent =
         "Evaluating your answer...";
 
 
     try {
 
-        const response = await fetch("/api/interview", {
-            method: "POST",
+        const response =
+            await fetch(
+                "/api/interview",
+                {
+                    method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            body: JSON.stringify({
-                sessionId: sessionId,
-                message: answer
-            })
-        });
+                    body: JSON.stringify({
+                        sessionId:
+                            sessionId,
+
+                        message:
+                            answer
+                    })
+                }
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!response.ok) {
+
             throw new Error(
-                data.error || "Failed to process answer."
+                data.error ||
+                "Failed to process answer."
             );
         }
 
 
+        // -------------------------
         // Interview completed
+        // -------------------------
+
         if (data.done === true) {
 
-            showFeedback(data.feedback);
+            showFeedback(
+                data.feedback
+            );
 
             return;
         }
 
 
+        // -------------------------
         // Continue interview
+        // -------------------------
+
         if (!data.reply) {
 
             throw new Error(
@@ -252,7 +326,8 @@ async function submitAnswer() {
 
         questionNumber++;
 
-        questionText.textContent = data.reply;
+        questionText.textContent =
+            data.reply;
 
         answerInput.value = "";
 
@@ -266,7 +341,10 @@ async function submitAnswer() {
 
     } catch (error) {
 
-        console.error("Submit answer error:", error);
+        console.error(
+            "Submit answer error:",
+            error
+        );
 
         interviewError.textContent =
             error.message ||
@@ -274,6 +352,7 @@ async function submitAnswer() {
 
         answerStatus.textContent =
             "Something went wrong. Try again.";
+
 
     } finally {
 
@@ -295,10 +374,14 @@ function showFeedback(feedback) {
     if (!feedback) {
 
         feedback = {
+
             summary:
                 "Your interview has been completed.",
+
             strengths: [],
+
             gaps: [],
+
             next:
                 "Review the topics covered during the interview."
         };
@@ -306,43 +389,141 @@ function showFeedback(feedback) {
 
 
     feedbackSummary.textContent =
-        feedback.summary || "Interview completed.";
+        feedback.summary ||
+        "Interview completed.";
 
+
+    // -------------------------
+    // Strengths
+    // -------------------------
 
     strengthsList.innerHTML = "";
 
     const strengths =
         feedback.strengths || [];
 
-    strengths.forEach(strength => {
 
-        const li = document.createElement("li");
+    strengths.forEach(
+        strength => {
 
-        li.textContent = strength;
+            const li =
+                document.createElement(
+                    "li"
+                );
 
-        strengthsList.appendChild(li);
-    });
+            li.textContent =
+                strength;
 
+            strengthsList.appendChild(
+                li
+            );
+        }
+    );
+
+
+    // -------------------------
+    // Gaps
+    // -------------------------
 
     gapsList.innerHTML = "";
 
     const gaps =
         feedback.gaps || [];
 
-    gaps.forEach(gap => {
 
-        const li = document.createElement("li");
+    gaps.forEach(
+        gap => {
 
-        li.textContent = gap;
+            const li =
+                document.createElement(
+                    "li"
+                );
 
-        gapsList.appendChild(li);
-    });
+            li.textContent =
+                gap;
 
+            gapsList.appendChild(
+                li
+            );
+        }
+    );
+
+
+    // -------------------------
+    // Next Step
+    // -------------------------
 
     nextStepText.textContent =
         feedback.next ||
         "Continue strengthening the areas covered in the interview.";
 
 
-    showScreen(completeScreen);
+    showScreen(
+        completeScreen
+    );
+}
+
+
+// -------------------------
+// Restart Interview
+// -------------------------
+
+restartButton.addEventListener(
+    "click",
+    restartInterview
+);
+
+
+function restartInterview() {
+
+    sessionId = null;
+    questionNumber = 0;
+
+
+    // Reset inputs
+
+    candidateInput.value = "";
+    answerInput.value = "";
+
+
+    // Reset question UI
+
+    questionText.textContent =
+        "Preparing your interview...";
+
+
+    questionCounter.textContent =
+        "Question 0 / 8";
+
+    progressFill.style.width =
+        "0%";
+
+
+    // Reset feedback
+
+    feedbackSummary.textContent =
+        "Your personalized feedback is ready.";
+
+    strengthsList.innerHTML = "";
+    gapsList.innerHTML = "";
+
+    nextStepText.textContent = "";
+
+
+    // Reset errors/status
+
+    startError.textContent = "";
+    interviewError.textContent = "";
+
+    answerStatus.textContent =
+        "Be clear and explain your reasoning.";
+
+
+    // Return to start screen
+
+    showScreen(
+        startScreen
+    );
+
+    candidateInput.focus();
 }
