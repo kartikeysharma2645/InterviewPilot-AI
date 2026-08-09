@@ -10,6 +10,13 @@ class InterviewSession:
     interview_plan: Any
 
     current_question_index: int = 0
+    primary_questions_asked: int = 0
+    followups_asked: int = 0
+
+    current_question: str | None = None
+    current_question_day: int | None = None
+    current_question_type: str | None = None
+    
     history: list[dict[str, Any]] = field(default_factory=list)
     evaluations: list[dict[str, Any]] = field(default_factory=list)
 
