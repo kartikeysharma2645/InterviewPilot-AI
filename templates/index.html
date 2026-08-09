@@ -2,12 +2,191 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interview Agent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InterviewPilot AI</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
+
 <body>
 
-    <h1>Interview Agent</h1>
-    <p>Flask is running successfully.</p>
+    <main class="app">
+
+        <!-- Landing Screen -->
+        <section id="start-screen" class="screen">
+            <div class="hero-card">
+
+                <div class="brand">
+                    <span class="brand-mark">✦</span>
+                    <span>InterviewPilot AI</span>
+                </div>
+
+                <p class="eyebrow">AI INTERVIEW AGENT</p>
+
+                <h1>
+                    Your learning journey.
+                    <span>Your interview.</span>
+                </h1>
+
+                <p class="description">
+                    A personalized technical interview powered by your
+                    curriculum progress, learning signals, and adaptive AI.
+                </p>
+
+                <div class="candidate-input">
+                    <label for="candidate-id">Candidate ID</label>
+
+                    <input
+                        type="text"
+                        id="candidate-id"
+                        placeholder="e.g. CAND-001"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button id="start-btn" class="primary-btn">
+                    Start Interview
+                    <span>→</span>
+                </button>
+
+                <p id="start-error" class="error-message"></p>
+
+            </div>
+        </section>
+
+
+        <!-- Interview Screen -->
+        <section id="interview-screen" class="screen hidden">
+
+            <header class="interview-header">
+
+                <div class="brand">
+                    <span class="brand-mark">✦</span>
+                    <span>InterviewPilot AI</span>
+                </div>
+
+                <div class="progress-container">
+                    <span id="question-counter">
+                        Question 1 / 8
+                    </span>
+
+                    <div class="progress-bar">
+                        <div
+                            id="progress-fill"
+                            class="progress-fill"
+                        ></div>
+                    </div>
+                </div>
+
+            </header>
+
+
+            <div class="interview-layout">
+
+                <!-- Interviewer -->
+                <section class="question-panel">
+
+                    <div class="panel-label">
+                        INTERVIEWER
+                    </div>
+
+                    <div class="question-card">
+                        <div class="ai-icon">✦</div>
+
+                        <p id="question-text">
+                            Preparing your interview...
+                        </p>
+                    </div>
+
+                </section>
+
+
+                <!-- Candidate -->
+                <section class="answer-panel">
+
+                    <div class="panel-label">
+                        YOUR ANSWER
+                    </div>
+
+                    <textarea
+                        id="answer-input"
+                        placeholder="Type your answer here..."
+                        rows="8"
+                    ></textarea>
+
+                    <div class="answer-footer">
+
+                        <span id="answer-status">
+                            Be clear and explain your reasoning.
+                        </span>
+
+                        <button
+                            id="submit-btn"
+                            class="primary-btn"
+                        >
+                            Submit Answer
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                    <p id="interview-error" class="error-message"></p>
+
+                </section>
+
+            </div>
+
+        </section>
+
+
+        <!-- Completion Screen -->
+        <section id="complete-screen" class="screen hidden">
+
+            <div class="completion-card">
+
+                <div class="completion-icon">✓</div>
+
+                <p class="eyebrow">INTERVIEW COMPLETE</p>
+
+                <h1>Interview finished.</h1>
+
+                <p id="feedback-summary" class="description">
+                    Your personalized feedback is ready.
+                </p>
+
+
+                <div class="feedback-grid">
+
+                    <div class="feedback-section">
+                        <h3>Strengths</h3>
+                        <ul id="strengths-list"></ul>
+                    </div>
+
+                    <div class="feedback-section">
+                        <h3>Gaps</h3>
+                        <ul id="gaps-list"></ul>
+                    </div>
+
+                </div>
+
+
+                <div class="next-step">
+                    <h3>Recommended Next Step</h3>
+                    <p id="next-step-text"></p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
 </body>
 </html>
